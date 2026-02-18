@@ -1,58 +1,58 @@
 #include "bash.h"
 
-int handle_builtin(char **args, int *status)
+int handle_builtin(char **av, int *st)
 {
-	if (args == NULL || args[0] == NULL)
+	if (av == NULL || av[0] == NULL)
 	{
 		return (BUILTIN_NONE);
 	}
 
-	if (strcmp(args[0], "exit") == 0)
+	if (strcmp(av[0], "exit") == 0)
 	{
-		return (builtin_exit(args, status));
+		return (builtin_exit(av, st));
 	}
 
-	if (strcmp(args[0], "env") == 0)
+	if (strcmp(av[0], "env") == 0)
 	{
-		return (builtin_env(args, status));
+		return (builtin_env(av, st));
 	}
 
 	return (BUILTIN_NONE);
 }
 
-int builtin_exit(char **args, int *status)
+int builtin_exit(char **av, int *st)
 {
-	int code;
+	int n;
 
-	if (args[1] != NULL)
+	if (av[1] != NULL)
 	{
-		if (args[2] != NULL)
+		if (av[2] != NULL)
 		{
 			fprintf(stderr, "exit: too many arguments\n");
-			*status = 2;
+			*st = 2;
 			return (BUILTIN_HANDLED);
 		}
-		if (str_to_int(args[1], &code) == 0)
+		if (str_to_int(av[1], &n) == 0)
 		{
-			fprintf(stderr, "exit: Illegal number: %s\n", args[1]);
-			*status = 2;
+			fprintf(stderr, "exit: Illegal number: %s\n", av[1]);
+			*st = 2;
 			return (BUILTIN_HANDLED);
 		}
-		*status = code % 256;
+		*st = n % 256;
 	}
 
 	return (BUILTIN_EXIT);
 }
 
-int builtin_env(char **args, int *status)
+int builtin_env(char **av, int *st)
 {
 	int i;
 
-	(void)args;
+	(void)av;
 
 	if (environ == NULL)
 	{
-		*status = 0;
+		*st = 0;
 		return (BUILTIN_HANDLED);
 	}
 
@@ -62,6 +62,6 @@ int builtin_env(char **args, int *status)
 		write(STDOUT_FILENO, "\n", 1);
 	}
 
-	*status = 0;
+	*st = 0;
 	return (BUILTIN_HANDLED);
 }

@@ -1,27 +1,27 @@
 #include "bash.h"
 
-static int count_tokens(char *line)
+static int count_tokens(char *s)
 {
-	int count;
-	char *token;
+	int n;
+	char *tok;
 
-	count = 0;
-	token = strtok(line, " \t\r\n");
-	while (token)
+	n = 0;
+	tok = strtok(s, " \t\r\n");
+	while (tok)
 	{
-		count++;
-		token = strtok(NULL, " \t\r\n");
+		n++;
+		tok = strtok(NULL, " \t\r\n");
 	}
 
-	return (count);
+	return (n);
 }
 
 char **split_line(char *line, int *argc)
 {
 	char *copy;
-	char *token;
-	char **args;
-	int count;
+	char *tok;
+	char **av;
+	int n;
 	int i;
 
 	if (line == NULL)
@@ -35,37 +35,37 @@ char **split_line(char *line, int *argc)
 		return (NULL);
 	}
 
-	count = count_tokens(copy);
+	n = count_tokens(copy);
 	free(copy);
 
-	args = malloc(sizeof(char *) * (count + 1));
-	if (args == NULL)
+	av = malloc(sizeof(char *) * (n + 1));
+	if (av == NULL)
 	{
 		return (NULL);
 	}
 
 	i = 0;
-	token = strtok(line, " \t\r\n");
-	while (token)
+	tok = strtok(line, " \t\r\n");
+	while (tok)
 	{
-		args[i] = token;
+		av[i] = tok;
 		i++;
-		token = strtok(NULL, " \t\r\n");
+		tok = strtok(NULL, " \t\r\n");
 	}
-	args[i] = NULL;
+	av[i] = NULL;
 
 	if (argc)
 	{
-		*argc = count;
+		*argc = n;
 	}
 
-	return (args);
+	return (av);
 }
 
-void free_args(char **args)
+void free_args(char **av)
 {
-	if (args)
+	if (av)
 	{
-		free(args);
+		free(av);
 	}
 }

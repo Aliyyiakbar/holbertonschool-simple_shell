@@ -64,7 +64,7 @@ char *str_duplicate(const char *s)
 
 int str_to_int(const char *s, int *out)
 {
-	long value;
+	long v;
 	int i;
 
 	if (s == NULL || s[0] == '\0')
@@ -72,7 +72,7 @@ int str_to_int(const char *s, int *out)
 		return (0);
 	}
 
-	value = 0;
+	v = 0;
 	i = 0;
 	if (s[i] == '+')
 	{
@@ -85,14 +85,14 @@ int str_to_int(const char *s, int *out)
 		{
 			return (0);
 		}
-		value = (value * 10) + (s[i] - '0');
-		if (value > INT_MAX)
+		v = (v * 10) + (s[i] - '0');
+		if (v > INT_MAX)
 		{
 			return (0);
 		}
 	}
 
-	*out = (int)value;
+	*out = (int)v;
 	return (1);
 }
 

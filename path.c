@@ -40,9 +40,9 @@ static char *build_path(const char *dir, const char *cmd)
 
 char *resolve_path(char *cmd)
 {
-	char *path_env;
-	char *path_copy;
-	char *token;
+	char *pe;
+	char *pc;
+	char *tok;
 	char *full;
 	char *found;
 
@@ -60,30 +60,30 @@ char *resolve_path(char *cmd)
 		return (NULL);
 	}
 
-	path_env = get_env_path();
-	if (path_env == NULL)
+	pe = get_env_path();
+	if (pe == NULL)
 	{
 		return (NULL);
 	}
 
-	path_copy = str_duplicate(path_env);
-	if (path_copy == NULL)
+	pc = str_duplicate(pe);
+	if (pc == NULL)
 	{
 		return (NULL);
 	}
 
 	found = NULL;
-	token = strtok(path_copy, ":");
-	while (token)
+	tok = strtok(pc, ":");
+	while (tok)
 	{
-		full = build_path(token, cmd);
+		full = build_path(tok, cmd);
 		if (full && access(full, X_OK) == 0)
 		{
 			if (found)
 			{
 				free(found);
 			}
-			free(path_copy);
+			free(pc);
 			return (full);
 		}
 		if (full && access(full, F_OK) == 0 && found == NULL)
@@ -94,9 +94,9 @@ char *resolve_path(char *cmd)
 		{
 			free(full);
 		}
-		token = strtok(NULL, ":");
+		tok = strtok(NULL, ":");
 	}
 
-	free(path_copy);
+	free(pc);
 	return (found);
 }

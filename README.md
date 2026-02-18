@@ -1,1 +1,2 @@
-This is our project.Cheers.
+Simple shell is a UNIX like basic system.
+

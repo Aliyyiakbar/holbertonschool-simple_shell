@@ -1,0 +1,59 @@
+.TH SIMPLE_SHELL 1 "February 2026" "1.0" "Simple Shell Manual"
+.SH NAME
+simple_shell \- a simple UNIX command line interpreter
+.SH SYNOPSIS
+.B simple_shell
+.SH DESCRIPTION
+Simple Shell is a basic UNIX command line interpreter that replicates basic functionalities of the sh shell. It reads commands from standard input and executes them.
+.SH USAGE
+The shell works in both interactive and non-interactive mode.
+.PP
+In interactive mode, run:
+.PP
+.RS
+$ ./simple_shell
+.RE
+.PP
+In non-interactive mode:
+.PP
+.RS
+$ echo "command" | ./simple_shell
+.RE
+.SH COMMANDS
+The following built-in commands are supported:
+.PP
+.B env
+.RS
+Prints the current environment variables
+.RE
+.PP
+.B exit
+.RS
+Exits the shell
+.RE
+.SH EXAMPLES
+.PP
+Interactive mode:
+.RS
+$ ./simple_shell
+.br
+($) /bin/ls
+.br
+file1 file2 file3
+.br
+($) exit
+.RE
+.PP
+Non-interactive mode:
+.RS
+$ echo "/bin/ls" | ./simple_shell
+.br
+file1 file2 file3
+.RE
+.SH SEE ALSO
+sh(1), bash(1)
+.SH BUGS
+No known bugs.
+.SH AUTHORS
+Nahid Agazadeh
+Aliyyiakbar Shirinli 

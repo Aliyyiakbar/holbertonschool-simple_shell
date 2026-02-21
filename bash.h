@@ -35,7 +35,7 @@ int b_exit(char **av, int *st, char *pr, int ln);
 int b_env(char **av, int *st);
 int b_set(char **av, int *st);
 int b_unset(char **av, int *st);
-int b_cd(char **av, int *st);
+int b_cd(char **av, int *st, char *pr, int ln);
 int b_alias(char **av, int *st);
 int b_help(char **av, int *st);
 int b_hist(char **av, int *st);

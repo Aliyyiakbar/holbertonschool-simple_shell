@@ -7,7 +7,7 @@
  * @st: status pointer
  * Return: 1 to continue, 0 to stop
  */
-static int cd_dst(char **av, char **dst, int *st)
+static int cd_dst(char **av, char **dst, int *st, char *pr, int ln)
 {
 	*dst = av[1];
 	if (*dst == NULL)
@@ -24,7 +24,7 @@ static int cd_dst(char **av, char **dst, int *st)
 		*dst = env_get("OLDPWD");
 		if (*dst == NULL)
 		{
-			fprintf(stderr, "cd: OLDPWD not set\n");
+			fprintf(stderr, "%s: %d: cd: OLDPWD not set\n", pr, ln);
 			*st = 1;
 			return (0);
 		}
@@ -38,18 +38,18 @@ static int cd_dst(char **av, char **dst, int *st)
  * @st: status pointer
  * Return: builtin code
  */
-int b_cd(char **av, int *st)
+int b_cd(char **av, int *st, char *pr, int ln)
 {
 	char *dst, *old, *nw;
 
-	if (!cd_dst(av, &dst, st))
+	if (!cd_dst(av, &dst, st, pr, ln))
 	{
 		return (BUILTIN_HANDLED);
 	}
 	old = getcwd(NULL, 0);
 	if (chdir(dst) != 0)
 	{
-		perror("cd");
+		fprintf(stderr, "%s: %d: cd: can't cd to %s\n", pr, ln, dst);
 		free(old);
 		*st = 1;
 		return (BUILTIN_HANDLED);

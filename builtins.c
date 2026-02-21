@@ -32,7 +32,7 @@ int b_run(char **av, int *st, char *pr, int ln)
 	}
 	if (s_cmp(av[0], "cd") == 0)
 	{
-		return (b_cd(av, st));
+		return (b_cd(av, st, pr, ln));
 	}
 	if (s_cmp(av[0], "alias") == 0)
 	{

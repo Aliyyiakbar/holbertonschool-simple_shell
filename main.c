@@ -11,6 +11,7 @@
 int main(int ac, char **av)
 {
 	int fd;
+	int st;
 
 	if (ac > 2)
 	{
@@ -18,6 +19,7 @@ int main(int ac, char **av)
 		return (1);
 	}
 
+	h_load();
 	if (ac == 2)
 	{
 		fd = open(av[1], O_RDONLY);
@@ -26,8 +28,13 @@ int main(int ac, char **av)
 			fprintf(stderr, "%s: 0: Can't open %s\n", av[0], av[1]);
 			return (127);
 		}
-		return (sh(av, fd));
+		st = sh(av, fd);
+		close(fd);
+		h_save();
+		return (st);
 	}
 
-	return (sh(av, STDIN_FILENO));
+	st = sh(av, STDIN_FILENO);
+	h_save();
+	return (st);
 }

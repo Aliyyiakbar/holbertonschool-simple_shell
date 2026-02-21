@@ -25,6 +25,22 @@ static int a_find(char *n)
 }
 
 /**
+ * a_get - get alias value
+ * @n: name
+ * Return: value or NULL
+ */
+char *a_get(char *n)
+{
+	int i;
+
+	if ((i = a_find(n)) >= 0)
+	{
+		return (a_v[i]);
+	}
+	return (NULL);
+}
+
+/**
  * a_set - set alias
  * @n: name
  * @v: value
@@ -33,9 +49,7 @@ static int a_find(char *n)
 static int a_set(char *n, char *v)
 {
 	int i;
-	char **nn;
-	char **nv;
-
+	char **nn, **nv;
 	i = a_find(n);
 	if (i >= 0)
 	{
@@ -64,9 +78,7 @@ static int a_set(char *n, char *v)
 		a_n = nn;
 		a_v = nv;
 	}
-	a_n[a_sz] = sdup(n);
-	a_v[a_sz] = sdup(v);
-	if (a_n[a_sz] == NULL || a_v[a_sz] == NULL)
+	if ((a_n[a_sz] = sdup(n)) == NULL || (a_v[a_sz] = sdup(v)) == NULL)
 	{
 		free(a_n[a_sz]);
 		free(a_v[a_sz]);
@@ -77,20 +89,17 @@ static int a_set(char *n, char *v)
 }
 
 /**
- * a_get - get alias value
- * @n: name
- * Return: value or NULL
+ * a_all - print all aliases
+ * Return: void
  */
-char *a_get(char *n)
+static void a_all(void)
 {
 	int i;
 
-	i = a_find(n);
-	if (i >= 0)
+	for (i = 0; i < a_sz; i++)
 	{
-		return (a_v[i]);
+		printf("%s='%s'\n", a_n[i], a_v[i]);
 	}
-	return (NULL);
 }
 
 /**
@@ -101,20 +110,12 @@ char *a_get(char *n)
  */
 int b_alias(char **av, int *st)
 {
-	char *eq;
-	char *v;
-	int i;
-	int ok;
-	int j;
-
-	ok = 1;
+	char *eq, *v;
+	int i, j;
+	*st = 0;
 	if (av[1] == NULL)
 	{
-		for (i = 0; i < a_sz; i++)
-		{
-			printf("%s='%s'\n", a_n[i], a_v[i]);
-		}
-		*st = 0;
+		a_all();
 		return (BUILTIN_HANDLED);
 	}
 	for (i = 1; av[i] != NULL; i++)
@@ -131,16 +132,19 @@ int b_alias(char **av, int *st)
 		}
 		*eq = '\0';
 		v = eq + 1;
-		if (v[0] == '\'' && v[strlen(v) - 1] == '\'')
+		if (v[0] == '\'')
 		{
-			v[strlen(v) - 1] = '\0';
-			v++;
+			j = (int)strlen(v);
+			if (j > 1 && v[j - 1] == '\'')
+			{
+				v[j - 1] = '\0';
+				v++;
+			}
 		}
 		if (!a_set(av[i], v))
 		{
-			ok = 0;
+			*st = 1;
 		}
 	}
-	*st = ok ? 0 : 1;
 	return (BUILTIN_HANDLED);
 }

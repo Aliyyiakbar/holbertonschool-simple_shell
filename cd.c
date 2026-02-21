@@ -8,15 +8,9 @@
  */
 int b_cd(char **av, int *st)
 {
-	char *dst;
-	char *old;
-	char *nw;
+	char *dst, *old, *nw;
 
-	dst = av[1];
-	if (dst == NULL)
-	{
-		dst = getenv("HOME");
-	}
+	dst = av[1] ? av[1] : getenv("HOME");
 	if (dst && strcmp(dst, "-") == 0)
 	{
 		dst = getenv("OLDPWD");

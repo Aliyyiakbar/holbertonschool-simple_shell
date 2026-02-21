@@ -28,6 +28,20 @@ static int env_idx(char *n)
 }
 
 /**
+ * env_cnt - count environ
+ * Return: count
+ */
+static int env_cnt(void)
+{
+	int cnt;
+
+	for (cnt = 0; environ && environ[cnt]; cnt++)
+	{
+	}
+	return (cnt);
+}
+
+/**
  * env_set - set env var
  * @n: name
  * @v: value
@@ -37,9 +51,7 @@ int env_set(char *n, char *v)
 {
 	char *s;
 	char **nv;
-	int i;
-	int cnt;
-
+	int i, cnt;
 	if (n == NULL || v == NULL || n[0] == '\0' || strchr(n, '='))
 	{
 		return (0);
@@ -56,9 +68,7 @@ int env_set(char *n, char *v)
 		environ[i] = s;
 		return (1);
 	}
-	for (cnt = 0; environ && environ[cnt]; cnt++)
-	{
-	}
+	cnt = env_cnt();
 	nv = malloc(sizeof(char *) * (cnt + 2));
 	if (nv == NULL)
 	{
@@ -102,9 +112,7 @@ int env_unset(char *n)
 	{
 		return (1);
 	}
-	for (cnt = 0; environ && environ[cnt]; cnt++)
-	{
-	}
+	cnt = env_cnt();
 	nv = malloc(sizeof(char *) * cnt);
 	if (nv == NULL)
 	{

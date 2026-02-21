@@ -102,3 +102,23 @@ void p_err(const char *pr, int ln, const char *c)
 {
 	fprintf(stderr, "%s: %d: %s: not found\n", pr, ln, c);
 }
+
+/**
+ * frev - free argv array
+ * @av: argv array
+ * Return: void
+ */
+void frev(char **av)
+{
+	int i;
+
+	if (av == NULL)
+	{
+		return;
+	}
+	for (i = 0; av[i] != NULL; i++)
+	{
+		free(av[i]);
+	}
+	free(av);
+}

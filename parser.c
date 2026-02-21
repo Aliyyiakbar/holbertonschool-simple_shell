@@ -72,6 +72,57 @@ static int push(char ***v, int *n, int *cap, char *s)
 }
 
 /**
+ * next_tok - add next token
+ * @s: input string
+ * @i: index
+ * @v: vector
+ * @n: count
+ * @cap: cap
+ * Return: 1 ok, 0 end, -1 err
+ */
+static int next_tok(char *s, int *i, char ***v, int *n, int *cap)
+{
+	int st;
+	int ln;
+	char *t;
+
+	while (ws(s[*i]))
+	{
+		(*i)++;
+	}
+	if (s[*i] == '\0')
+	{
+		return (0);
+	}
+	if (s[*i] == '#' && (*i == 0 || ws(s[*i - 1])))
+	{
+		return (0);
+	}
+	ln = op_len(s, *i);
+	if (ln)
+	{
+		t = sdup_n(s + *i, ln);
+		if (t == NULL || !push(v, n, cap, t))
+		{
+			return (-1);
+		}
+		*i += ln;
+		return (1);
+	}
+	st = *i;
+	while (s[*i] && !ws(s[*i]) && !op_len(s, *i))
+	{
+		(*i)++;
+	}
+	t = sdup_n(s + st, *i - st);
+	if (t == NULL || !push(v, n, cap, t))
+	{
+		return (-1);
+	}
+	return (1);
+}
+
+/**
  * spl - split line into tokens
  * @s: input string
  * @ac: argc output
@@ -83,9 +134,7 @@ char **spl(char *s, int *ac)
 	int n;
 	int cap;
 	int i;
-	int st;
-	int ln;
-	char *t;
+	int r;
 
 	if (s == NULL)
 	{
@@ -96,45 +145,14 @@ char **spl(char *s, int *ac)
 	n = 0;
 	cap = 0;
 	i = 0;
-	while (s[i])
+	while ((r = next_tok(s, &i, &v, &n, &cap)) > 0)
 	{
-		while (ws(s[i]))
-		{
-			i++;
-		}
-		if (s[i] == '\0')
-		{
-			break;
-		}
-		if (s[i] == '#' && (i == 0 || ws(s[i - 1])))
-		{
-			break;
-		}
-		ln = op_len(s, i);
-		if (ln)
-		{
-			t = sdup_n(s + i, ln);
-			if (t == NULL || !push(&v, &n, &cap, t))
-			{
-				frev(v);
-				return (NULL);
-			}
-			i += ln;
-			continue;
-		}
-		st = i;
-		while (s[i] && !ws(s[i]) && !op_len(s, i))
-		{
-			i++;
-		}
-		t = sdup_n(s + st, i - st);
-		if (t == NULL || !push(&v, &n, &cap, t))
-		{
-			frev(v);
-			return (NULL);
-		}
 	}
-
+	if (r < 0)
+	{
+		frev(v);
+		return (NULL);
+	}
 	if (v == NULL)
 	{
 		v = malloc(sizeof(char *));
@@ -144,30 +162,9 @@ char **spl(char *s, int *ac)
 		}
 		v[0] = NULL;
 	}
-
 	if (ac)
 	{
 		*ac = n;
 	}
 	return (v);
-}
-
-/**
- * frev - free argv array
- * @av: argv array
- * Return: void
- */
-void frev(char **av)
-{
-	int i;
-
-	if (av == NULL)
-	{
-		return;
-	}
-	for (i = 0; av[i] != NULL; i++)
-	{
-		free(av[i]);
-	}
-	free(av);
 }

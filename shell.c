@@ -28,50 +28,9 @@ void sig_h(int s)
 }
 
 /**
- * do_ln - handle one line
- * @buf: input buffer
- * @pr: program name
- * @ln: line number
- * @st: status pointer
- * Return: 1 to break, 0 to continue
- */
-static int do_ln(char *buf, char *pr, int ln, int *st)
-{
-	char **av;
-	int br;
-
-	if (is_sp(buf))
-	{
-		return (0);
-	}
-
-	av = spl(buf, NULL);
-	if (av == NULL || av[0] == NULL)
-	{
-		frev(av);
-		return (0);
-	}
-
-	br = b_run(av, st);
-	if (br == BUILTIN_EXIT)
-	{
-		frev(av);
-		return (1);
-	}
-	if (br == BUILTIN_HANDLED)
-	{
-		frev(av);
-		return (0);
-	}
-
-	run(av, pr, ln, st);
-	frev(av);
-	return (0);
-}
-
-/**
  * sh - main shell loop
  * @av0: argv
+ * @fd: input fd
  * Return: status
  */
 int sh(char **av0, int fd)
@@ -104,7 +63,7 @@ int sh(char **av0, int fd)
 		}
 
 		ln++;
-		if (do_ln(buf, av0[0], ln, &st))
+		if (exec_ln(buf, av0[0], &st, ln))
 		{
 			free(buf);
 			break;

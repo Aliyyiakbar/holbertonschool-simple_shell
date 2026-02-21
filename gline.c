@@ -1,5 +1,12 @@
 #include "bash.h"
 
+/**
+ * grow - grow buffer
+ * @s: buffer
+ * @cap: cap
+ * @need: needed size
+ * Return: buffer or NULL
+ */
 static char *grow(char *s, size_t *cap, size_t need)
 {
 	size_t nc;
@@ -30,6 +37,51 @@ static char *grow(char *s, size_t *cap, size_t need)
 }
 
 /**
+ * rfill - refill buffer
+ * @fd: fd
+ * @b: buf
+ * @n: size
+ * @i: index
+ * Return: 0 eof, 1 retry, 2 ok
+ */
+static int rfill(int fd, char *b, int *n, int *i)
+{
+	*n = (int)read(fd, b, 1024);
+	*i = 0;
+	if (*n < 0 && errno == EINTR)
+	{
+		return (1);
+	}
+	if (*n <= 0)
+	{
+		return (0);
+	}
+	return (2);
+}
+
+/**
+ * addc - add char to line
+ * @s: buffer
+ * @cap: cap
+ * @len: len
+ * @c: char
+ * Return: 1 on ok
+ */
+static int addc(char **s, size_t *cap, size_t *len, char c)
+{
+	if (*len + 2 > *cap)
+	{
+		*s = grow(*s, cap, *len + 2);
+		if (*s == NULL)
+		{
+			return (0);
+		}
+	}
+	(*s)[(*len)++] = c;
+	return (1);
+}
+
+/**
  * gl - read one line from fd
  * @fd: file descriptor
  * Return: line or NULL
@@ -40,7 +92,7 @@ char *gl(int fd)
 	static int n, i;
 	char *s;
 	size_t cap, len;
-	char c;
+	int r;
 
 	s = NULL;
 	cap = 0;
@@ -49,29 +101,25 @@ char *gl(int fd)
 	{
 		if (i >= n)
 		{
-			n = (int)read(fd, b, sizeof(b));
-			i = 0;
-			if (n <= 0)
+			r = rfill(fd, b, &n, &i);
+			if (r == 1)
+			{
+				continue;
+			}
+			if (r == 0)
 			{
 				break;
 			}
 		}
-		c = b[i++];
-		if (len + 2 > cap)
+		if (!addc(&s, &cap, &len, b[i++]))
 		{
-			s = grow(s, &cap, len + 2);
-			if (s == NULL)
-			{
-				return (NULL);
-			}
+			return (NULL);
 		}
-		s[len++] = c;
-		if (c == '\n')
+		if (s[len - 1] == '\n')
 		{
 			break;
 		}
 	}
-
 	if (len == 0)
 	{
 		free(s);

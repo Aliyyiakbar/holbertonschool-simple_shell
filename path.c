@@ -49,17 +49,33 @@ static char *mk_path(const char *d, const char *c)
 }
 
 /**
- * sl_ok - check slash path
- * @c: cmd path
- * Return: dup path or NULL
+ * try_dir - try one dir
+ * @d: dir
+ * @c: cmd
+ * @fd: found path
+ * @pc: PATH copy
+ * Return: path or NULL
  */
-static char *sl_ok(char *c)
+static char *try_dir(char *d, char *c, char **fd, char *pc)
 {
-	if (access(c, X_OK) == 0 || access(c, F_OK) == 0)
-	{
-		return (sdup(c));
-	}
+	char *p;
 
+	p = mk_path(d, c);
+	if (p && access(p, X_OK) == 0)
+	{
+		if (*fd)
+		{
+			free(*fd);
+		}
+		free(pc);
+		return (p);
+	}
+	if (p && access(p, F_OK) == 0 && *fd == NULL)
+	{
+		*fd = p;
+		return (NULL);
+	}
+	free(p);
 	return (NULL);
 }
 
@@ -71,13 +87,8 @@ static char *sl_ok(char *c)
  */
 static char *scan(char *pc, char *c)
 {
-	char *d;
-	char *p;
-	char *fd;
-	size_t i;
-	size_t st;
-	size_t ln;
-
+	char *d, *fd, *p;
+	size_t i, st, ln;
 	fd = NULL;
 	i = 0;
 	st = 0;
@@ -86,38 +97,18 @@ static char *scan(char *pc, char *c)
 		if (pc[i] == ':' || pc[i] == '\0')
 		{
 			ln = i - st;
-			if (ln == 0)
-			{
-				d = sdup(".");
-			}
-			else
-			{
-				d = sdup_n(pc + st, ln);
-			}
+			d = (ln == 0) ? sdup(".") : sdup_n(pc + st, ln);
 			if (d == NULL)
 			{
 				free(fd);
 				free(pc);
 				return (NULL);
 			}
-			p = mk_path(d, c);
+			p = try_dir(d, c, &fd, pc);
 			free(d);
-			if (p && access(p, X_OK) == 0)
+			if (p)
 			{
-				if (fd)
-				{
-					free(fd);
-				}
-				free(pc);
 				return (p);
-			}
-			if (p && access(p, F_OK) == 0 && fd == NULL)
-			{
-				fd = p;
-			}
-			else
-			{
-				free(p);
 			}
 			if (pc[i] == '\0')
 			{
@@ -149,7 +140,11 @@ char *rpath(char *c)
 
 	if (has_sl(c))
 	{
-		return (sl_ok(c));
+		if (access(c, X_OK) == 0 || access(c, F_OK) == 0)
+		{
+			return (sdup(c));
+		}
+		return (NULL);
 	}
 
 	pe = env_path();

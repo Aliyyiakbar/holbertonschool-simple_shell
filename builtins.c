@@ -12,12 +12,10 @@ int b_run(char **av, int *st)
 	{
 		return (BUILTIN_NONE);
 	}
-
 	if (strcmp(av[0], "exit") == 0)
 	{
 		return (b_exit(av, st));
 	}
-
 	if (strcmp(av[0], "env") == 0)
 	{
 		return (b_env(av, st));
@@ -46,7 +44,6 @@ int b_run(char **av, int *st)
 	{
 		return (b_hist(av, st));
 	}
-
 	return (BUILTIN_NONE);
 }
 

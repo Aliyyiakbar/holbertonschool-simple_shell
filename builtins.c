@@ -4,9 +4,11 @@
  * b_run - run builtin if match
  * @av: argv array
  * @st: status pointer
+ * @pr: program name
+ * @ln: line number
  * Return: builtin code
  */
-int b_run(char **av, int *st)
+int b_run(char **av, int *st, char *pr, int ln)
 {
 	if (av == NULL || av[0] == NULL)
 	{
@@ -14,7 +16,7 @@ int b_run(char **av, int *st)
 	}
 	if (s_cmp(av[0], "exit") == 0)
 	{
-		return (b_exit(av, st));
+		return (b_exit(av, st, pr, ln));
 	}
 	if (s_cmp(av[0], "env") == 0)
 	{
@@ -51,9 +53,11 @@ int b_run(char **av, int *st)
  * b_exit - handle exit builtin
  * @av: argv array
  * @st: status pointer
+ * @pr: program name
+ * @ln: line number
  * Return: builtin code
  */
-int b_exit(char **av, int *st)
+int b_exit(char **av, int *st, char *pr, int ln)
 {
 	int n;
 
@@ -61,13 +65,14 @@ int b_exit(char **av, int *st)
 	{
 		if (av[2] != NULL)
 		{
-			fprintf(stderr, "exit: too many arguments\n");
+			fprintf(stderr, "%s: %d: exit: too many arguments\n", pr, ln);
 			*st = 2;
 			return (BUILTIN_HANDLED);
 		}
 		if (s2i(av[1], &n) == 0)
 		{
-			fprintf(stderr, "exit: Illegal number: %s\n", av[1]);
+			fprintf(stderr, "%s: %d: exit: Illegal number: %s\n",
+				pr, ln, av[1]);
 			*st = 2;
 			return (BUILTIN_HANDLED);
 		}

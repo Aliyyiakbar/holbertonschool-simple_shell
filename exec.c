@@ -71,7 +71,7 @@ static int do_cmd(char **av, char *pr, int ln, int *st)
 {
 	int br;
 
-	br = b_run(av, st);
+	br = b_run(av, st, pr, ln);
 	if (br == BUILTIN_EXIT)
 	{
 		return (1);

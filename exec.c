@@ -104,7 +104,7 @@ static int run_seg(char **t, int i, int j, char *pr, int ln, int *st, int op)
 	{
 		return (0);
 	}
-	av = a_exp(av);
+	av = a_expa(av);
 	vrep(av, *st);
 	if (op == 2 && *st != 0)
 	{

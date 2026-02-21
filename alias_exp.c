@@ -85,3 +85,27 @@ char **a_exp(char **av)
 	frev(av);
 	return (nv);
 }
+
+/**
+ * a_expa - expand alias repeatedly
+ * @av: argv array
+ * Return: argv array
+ */
+char **a_expa(char **av)
+{
+	char **old;
+	int k;
+
+	k = 0;
+	while (av && av[0] && a_get(av[0]) && k < 10)
+	{
+		old = av;
+		av = a_exp(av);
+		if (av == old)
+		{
+			break;
+		}
+		k++;
+	}
+	return (av);
+}

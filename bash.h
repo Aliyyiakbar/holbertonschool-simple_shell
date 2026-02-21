@@ -46,6 +46,7 @@ void env_free(void);
 void vrep(char **av, int st);
 char *a_get(char *n);
 char **a_exp(char **av);
+char **a_expa(char **av);
 void a_free(void);
 void h_add(char *s);
 void h_load(void);

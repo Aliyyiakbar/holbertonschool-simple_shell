@@ -3,67 +3,64 @@
 static int g_own;
 
 /**
- * env_idx - find env index
- * @n: name
- * Return: index or -1
+ * env_dup - duplicate environ
+ * @cnt: count output
+ * Return: new environ or NULL
  */
-static int env_idx(char *n)
+static char **env_dup(int *cnt)
 {
-	size_t ln;
-	int i;
+	char **nv;
+	int i, n;
 
-	if (environ == NULL)
+	for (n = 0; environ && environ[n]; n++)
 	{
-		return (-1);
 	}
-	ln = s_len(n);
-	for (i = 0; environ[i] != NULL; i++)
-	{
-		if (s_ncmp(environ[i], n, ln) == 0 && environ[i][ln] == '=')
-		{
-			return (i);
-		}
-	}
-	return (-1);
-}
-
-/**
- * env_get - get env value
- * @n: name
- * Return: value or NULL
- */
-char *env_get(const char *n)
-{
-	size_t ln;
-	int i;
-
-	if (n == NULL || n[0] == '\0' || environ == NULL)
+	nv = malloc(sizeof(char *) * (n + 1));
+	if (nv == NULL)
 	{
 		return (NULL);
 	}
-	ln = s_len(n);
-	for (i = 0; environ[i] != NULL; i++)
+	for (i = 0; i < n; i++)
 	{
-		if (s_ncmp(environ[i], n, ln) == 0 && environ[i][ln] == '=')
+		nv[i] = sdup(environ[i]);
+		if (nv[i] == NULL)
 		{
-			return (environ[i] + ln + 1);
+			while (i-- > 0)
+			{
+				free(nv[i]);
+			}
+			free(nv);
+			return (NULL);
 		}
 	}
-	return (NULL);
+	nv[n] = NULL;
+	if (cnt)
+	{
+		*cnt = n;
+	}
+	return (nv);
 }
 
 /**
- * env_cnt - count environ
- * Return: count
+ * env_own - ensure owned environ
+ * Return: 1 on ok
  */
-static int env_cnt(void)
+static int env_own(void)
 {
-	int cnt;
+	char **nv;
 
-	for (cnt = 0; environ && environ[cnt]; cnt++)
+	if (g_own)
 	{
+		return (1);
 	}
-	return (cnt);
+	nv = env_dup(NULL);
+	if (nv == NULL)
+	{
+		return (0);
+	}
+	environ = nv;
+	g_own = 1;
+	return (1);
 }
 
 /**
@@ -77,7 +74,8 @@ int env_set(char *n, char *v)
 	char *s;
 	char **nv;
 	int i, cnt;
-	if (n == NULL || v == NULL || n[0] == '\0' || s_chr(n, '='))
+	if (n == NULL || v == NULL || n[0] == '\0' ||
+		s_chr(n, '=') || !env_own())
 	{
 		return (0);
 	}
@@ -90,10 +88,13 @@ int env_set(char *n, char *v)
 	i = env_idx(n);
 	if (i >= 0)
 	{
+		free(environ[i]);
 		environ[i] = s;
 		return (1);
 	}
-	cnt = env_cnt();
+	for (cnt = 0; environ && environ[cnt]; cnt++)
+	{
+	}
 	nv = malloc(sizeof(char *) * (cnt + 2));
 	if (nv == NULL)
 	{
@@ -106,12 +107,8 @@ int env_set(char *n, char *v)
 	}
 	nv[cnt] = s;
 	nv[cnt + 1] = NULL;
-	if (g_own)
-	{
-		free(environ);
-	}
+	free(environ);
 	environ = nv;
-	g_own = 1;
 	return (1);
 }
 
@@ -132,17 +129,24 @@ int env_unset(char *n)
 	{
 		return (0);
 	}
+	if (!env_own())
+	{
+		return (0);
+	}
 	idx = env_idx(n);
 	if (idx < 0)
 	{
 		return (1);
 	}
-	cnt = env_cnt();
+	for (cnt = 0; environ && environ[cnt]; cnt++)
+	{
+	}
 	nv = malloc(sizeof(char *) * cnt);
 	if (nv == NULL)
 	{
 		return (0);
 	}
+	free(environ[idx]);
 	for (i = 0, j = 0; i < cnt; i++)
 	{
 		if (i != idx)
@@ -151,11 +155,28 @@ int env_unset(char *n)
 		}
 	}
 	nv[j] = NULL;
-	if (g_own)
-	{
-		free(environ);
-	}
+	free(environ);
 	environ = nv;
-	g_own = 1;
 	return (1);
+}
+
+/**
+ * env_free - free environ
+ * Return: void
+ */
+void env_free(void)
+{
+	int i;
+
+	if (!g_own)
+	{
+		return;
+	}
+	for (i = 0; environ && environ[i]; i++)
+	{
+		free(environ[i]);
+	}
+	free(environ);
+	environ = NULL;
+	g_own = 0;
 }

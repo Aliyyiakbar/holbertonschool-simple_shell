@@ -1,9 +1,9 @@
 #include "bash.h"
 
-static char **a_n;
-static char **a_v;
-static int a_sz;
-static int a_cap;
+char **a_n;
+char **a_v;
+int a_sz;
+int a_cap;
 
 /**
  * a_find - find alias index

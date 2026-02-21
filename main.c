@@ -26,15 +26,25 @@ int main(int ac, char **av)
 		if (fd < 0)
 		{
 			fprintf(stderr, "%s: 0: Can't open %s\n", av[0], av[1]);
+			h_save();
+			h_free();
+			env_free();
+			a_free();
 			return (127);
 		}
 		st = sh(av, fd);
 		close(fd);
 		h_save();
+		h_free();
+		env_free();
+		a_free();
 		return (st);
 	}
 
 	st = sh(av, STDIN_FILENO);
 	h_save();
+	h_free();
+	env_free();
+	a_free();
 	return (st);
 }

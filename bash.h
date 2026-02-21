@@ -12,6 +12,10 @@
 #include <unistd.h>
 
 extern char **environ;
+extern char **a_n;
+extern char **a_v;
+extern int a_sz;
+extern int a_cap;
 
 #define PROMPT "($) "
 #define BUILTIN_NONE 0
@@ -37,12 +41,16 @@ int b_help(char **av, int *st);
 int b_hist(char **av, int *st);
 int env_set(char *n, char *v);
 int env_unset(char *n);
+int env_idx(char *n);
+void env_free(void);
 void vrep(char **av, int st);
 char *a_get(char *n);
 char **a_exp(char **av);
+void a_free(void);
 void h_add(char *s);
 void h_load(void);
 void h_save(void);
+void h_free(void);
 char *rpath(char *c);
 int is_sp(const char *s);
 int has_sl(const char *s);

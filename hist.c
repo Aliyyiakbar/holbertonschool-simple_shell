@@ -6,37 +6,6 @@ static int h_cap;
 static int h_base;
 
 /**
- * h_push - push history line
- * @s: line
- * Return: 1 on ok
- */
-static int h_push(char *s)
-{
-	char **nv;
-	int nc;
-	int i;
-
-	if (h_n + 1 > h_cap)
-	{
-		nc = (h_cap == 0) ? 16 : (h_cap * 2);
-		nv = malloc(sizeof(char *) * nc);
-		if (nv == NULL)
-		{
-			return (0);
-		}
-		for (i = 0; i < h_n; i++)
-		{
-			nv[i] = h_v[i];
-		}
-		free(h_v);
-		h_v = nv;
-		h_cap = nc;
-	}
-	h_v[h_n++] = s;
-	return (1);
-}
-
-/**
  * h_add - add to history
  * @s: line
  * Return: void
@@ -45,6 +14,9 @@ void h_add(char *s)
 {
 	size_t n;
 	char *c;
+	char **nv;
+	int nc;
+	int i;
 
 	if (s == NULL)
 	{
@@ -60,7 +32,24 @@ void h_add(char *s)
 	{
 		return;
 	}
-	h_push(c);
+	if (h_n + 1 > h_cap)
+	{
+		nc = (h_cap == 0) ? 16 : (h_cap * 2);
+		nv = malloc(sizeof(char *) * nc);
+		if (nv == NULL)
+		{
+			free(c);
+			return;
+		}
+		for (i = 0; i < h_n; i++)
+		{
+			nv[i] = h_v[i];
+		}
+		free(h_v);
+		h_v = nv;
+		h_cap = nc;
+	}
+	h_v[h_n++] = c;
 }
 
 /**
@@ -159,4 +148,22 @@ void h_save(void)
 	}
 	close(fd);
 	free(p);
+}
+
+/**
+ * h_free - free history
+ * Return: void
+ */
+void h_free(void)
+{
+	int i;
+
+	for (i = 0; i < h_n; i++)
+	{
+		free(h_v[i]);
+	}
+	free(h_v);
+	h_v = NULL;
+	h_n = 0;
+	h_cap = 0;
 }

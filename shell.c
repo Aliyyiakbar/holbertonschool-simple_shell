@@ -18,10 +18,48 @@ void sig_h(int s)
 	}
 }
 
+static void ch_run(char **av, char *pr, int ln, char *p)
+{
+	execve(p, av, environ);
+	if (errno == EACCES)
+	{
+		fprintf(stderr, "%s: %d: %s: Permission denied\n",
+			pr, ln, av[0]);
+	}
+	else
+	{
+		fprintf(stderr, "%s: %d: %s: not found\n",
+			pr, ln, av[0]);
+	}
+	free(p);
+	exit(126);
+}
+
+static int wpid(pid_t pid, char *pr, int *st)
+{
+	int ws;
+
+	if (waitpid(pid, &ws, 0) == -1)
+	{
+		perror(pr);
+		*st = 1;
+		return (0);
+	}
+	if (WIFEXITED(ws))
+	{
+		*st = WEXITSTATUS(ws);
+	}
+	else
+	{
+		*st = 1;
+	}
+
+	return (0);
+}
+
 static int run(char **av, char *pr, int ln, int *st)
 {
 	pid_t pid;
-	int ws;
 	char *p;
 
 	p = rpath(av[0]);
@@ -35,19 +73,7 @@ static int run(char **av, char *pr, int ln, int *st)
 	pid = fork();
 	if (pid == 0)
 	{
-		execve(p, av, environ);
-		if (errno == EACCES)
-		{
-			fprintf(stderr, "%s: %d: %s: Permission denied\n",
-				pr, ln, av[0]);
-		}
-		else
-		{
-			fprintf(stderr, "%s: %d: %s: not found\n",
-				pr, ln, av[0]);
-		}
-		free(p);
-		exit(126);
+		ch_run(av, pr, ln, p);
 	}
 	else if (pid < 0)
 	{
@@ -56,31 +82,72 @@ static int run(char **av, char *pr, int ln, int *st)
 	}
 	else
 	{
-		if (waitpid(pid, &ws, 0) == -1)
-		{
-			perror(pr);
-			*st = 1;
-		}
-		else if (WIFEXITED(ws))
-		{
-			*st = WEXITSTATUS(ws);
-		}
-		else
-		{
-			*st = 1;
-		}
+		wpid(pid, pr, st);
 	}
 
 	free(p);
 	return (0);
 }
 
+static ssize_t gnl(char **b, size_t *cap, int tty)
+{
+	ssize_t n;
+
+	if (tty)
+	{
+		write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
+	}
+
+	n = getline(b, cap, stdin);
+	if (n == -1 && tty)
+	{
+		write(STDOUT_FILENO, "\n", 1);
+	}
+
+	return (n);
+}
+
+static int do_ln(char *buf, char *pr, int ln, int *st)
+{
+	char **av;
+	int br;
+
+	if (is_sp(buf))
+	{
+		return (0);
+	}
+
+	av = spl(buf, NULL);
+	if (av == NULL || av[0] == NULL)
+	{
+		frev(av);
+		return (0);
+	}
+
+	br = b_run(av, st);
+	if (br == BUILTIN_EXIT)
+	{
+		frev(av);
+		return (1);
+	}
+	if (br == BUILTIN_HANDLED)
+	{
+		frev(av);
+		return (0);
+	}
+
+	run(av, pr, ln, st);
+	frev(av);
+	return (0);
+}
+
 int sh(char **av0)
 {
-	char *buf, **av;
+	char *buf;
 	size_t cap;
 	ssize_t n;
-	int st, ln, br;
+	int st;
+	int ln;
 
 	buf = NULL;
 	cap = 0;
@@ -92,48 +159,17 @@ int sh(char **av0)
 
 	while (1)
 	{
-		if (g_tty)
-		{
-			write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
-		}
-
-		n = getline(&buf, &cap, stdin);
+		n = gnl(&buf, &cap, g_tty);
 		if (n == -1)
 		{
-			if (g_tty)
-			{
-				write(STDOUT_FILENO, "\n", 1);
-			}
 			break;
 		}
 
 		ln++;
-		if (is_sp(buf))
+		if (do_ln(buf, av0[0], ln, &st))
 		{
-			continue;
-		}
-
-		av = spl(buf, NULL);
-		if (av == NULL || av[0] == NULL)
-		{
-			frev(av);
-			continue;
-		}
-
-		br = b_run(av, &st);
-		if (br == BUILTIN_EXIT)
-		{
-			frev(av);
 			break;
 		}
-		if (br == BUILTIN_HANDLED)
-		{
-			frev(av);
-			continue;
-		}
-
-		run(av, av0[0], ln, &st);
-		frev(av);
 	}
 
 	free(buf);

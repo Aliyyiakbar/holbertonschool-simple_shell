@@ -38,35 +38,21 @@ static char *mk_path(const char *d, const char *c)
 	return (p);
 }
 
-char *rpath(char *c)
+static char *sl_ok(char *c)
 {
-	char *pe, *pc, *t, *p, *fd;
-
-	if (c == NULL || c[0] == '\0')
+	if (access(c, X_OK) == 0 || access(c, F_OK) == 0)
 	{
-		return (NULL);
+		return (sdup(c));
 	}
 
-	if (has_sl(c))
-	{
-		if (access(c, X_OK) == 0 || access(c, F_OK) == 0)
-		{
-			return (sdup(c));
-		}
-		return (NULL);
-	}
+	return (NULL);
+}
 
-	pe = env_path();
-	if (pe == NULL)
-	{
-		return (NULL);
-	}
-
-	pc = sdup(pe);
-	if (pc == NULL)
-	{
-		return (NULL);
-	}
+static char *scan(char *pc, char *c)
+{
+	char *t;
+	char *p;
+	char *fd;
 
 	fd = NULL;
 	t = strtok(pc, ":");
@@ -95,4 +81,34 @@ char *rpath(char *c)
 
 	free(pc);
 	return (fd);
+}
+
+char *rpath(char *c)
+{
+	char *pe;
+	char *pc;
+
+	if (c == NULL || c[0] == '\0')
+	{
+		return (NULL);
+	}
+
+	if (has_sl(c))
+	{
+		return (sl_ok(c));
+	}
+
+	pe = env_path();
+	if (pe == NULL)
+	{
+		return (NULL);
+	}
+
+	pc = sdup(pe);
+	if (pc == NULL)
+	{
+		return (NULL);
+	}
+
+	return (scan(pc, c));
 }

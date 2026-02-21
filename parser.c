@@ -16,13 +16,27 @@ static int ctok(char *s)
 	return (n);
 }
 
+static void fillv(char **v, char *s)
+{
+	int i;
+	char *t;
+
+	i = 0;
+	t = strtok(s, " \t\r\n");
+	while (t)
+	{
+		v[i] = t;
+		i++;
+		t = strtok(NULL, " \t\r\n");
+	}
+	v[i] = NULL;
+}
+
 char **spl(char *s, int *ac)
 {
 	char *c;
-	char *t;
 	char **v;
 	int n;
-	int i;
 
 	if (s == NULL)
 	{
@@ -44,15 +58,7 @@ char **spl(char *s, int *ac)
 		return (NULL);
 	}
 
-	i = 0;
-	t = strtok(s, " \t\r\n");
-	while (t)
-	{
-		v[i] = t;
-		i++;
-		t = strtok(NULL, " \t\r\n");
-	}
-	v[i] = NULL;
+	fillv(v, s);
 
 	if (ac)
 	{

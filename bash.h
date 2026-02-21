@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 extern char **environ;
@@ -20,6 +21,7 @@ extern char **environ;
 int sh(char **av);
 void sig_h(int s);
 int is_tty(void);
+int run(char **av, char *pr, int ln, int *st);
 char **spl(char *s, int *ac);
 void frev(char **av);
 int b_run(char **av, int *st);

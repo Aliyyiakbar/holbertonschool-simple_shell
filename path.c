@@ -1,5 +1,9 @@
 #include "bash.h"
 
+/**
+ * env_path - get PATH env value
+ * Return: PATH string or NULL
+ */
 static char *env_path(void)
 {
 	int i;
@@ -22,6 +26,12 @@ static char *env_path(void)
 	return (NULL);
 }
 
+/**
+ * mk_path - join dir and cmd
+ * @d: dir
+ * @c: cmd
+ * Return: full path or NULL
+ */
 static char *mk_path(const char *d, const char *c)
 {
 	size_t n;
@@ -38,6 +48,11 @@ static char *mk_path(const char *d, const char *c)
 	return (p);
 }
 
+/**
+ * sl_ok - check slash path
+ * @c: cmd path
+ * Return: dup path or NULL
+ */
 static char *sl_ok(char *c)
 {
 	if (access(c, X_OK) == 0 || access(c, F_OK) == 0)
@@ -48,6 +63,12 @@ static char *sl_ok(char *c)
 	return (NULL);
 }
 
+/**
+ * scan - scan PATH for cmd
+ * @pc: PATH copy
+ * @c: cmd
+ * Return: found path or NULL
+ */
 static char *scan(char *pc, char *c)
 {
 	char *t;
@@ -83,6 +104,11 @@ static char *scan(char *pc, char *c)
 	return (fd);
 }
 
+/**
+ * rpath - resolve cmd path
+ * @c: cmd
+ * Return: resolved path or NULL
+ */
 char *rpath(char *c)
 {
 	char *pe;

@@ -1,5 +1,13 @@
 #include "bash.h"
 
+/**
+ * ch_run - exec child process
+ * @av: argv array
+ * @pr: program name
+ * @ln: line number
+ * @p: resolved path
+ * Return: void
+ */
 static void ch_run(char **av, char *pr, int ln, char *p)
 {
 	execve(p, av, environ);
@@ -17,6 +25,13 @@ static void ch_run(char **av, char *pr, int ln, char *p)
 	exit(126);
 }
 
+/**
+ * wpid - wait for child
+ * @pid: child pid
+ * @pr: program name
+ * @st: status pointer
+ * Return: 0
+ */
 static int wpid(pid_t pid, char *pr, int *st)
 {
 	int ws;
@@ -39,6 +54,14 @@ static int wpid(pid_t pid, char *pr, int *st)
 	return (0);
 }
 
+/**
+ * run - run external command
+ * @av: argv array
+ * @pr: program name
+ * @ln: line number
+ * @st: status pointer
+ * Return: 0
+ */
 int run(char **av, char *pr, int ln, int *st)
 {
 	pid_t pid;

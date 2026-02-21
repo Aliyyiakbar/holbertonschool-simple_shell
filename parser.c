@@ -1,5 +1,10 @@
 #include "bash.h"
 
+/**
+ * ctok - count tokens in string
+ * @s: input string
+ * Return: token count
+ */
 static int ctok(char *s)
 {
 	int n;
@@ -16,6 +21,12 @@ static int ctok(char *s)
 	return (n);
 }
 
+/**
+ * fillv - fill argv array
+ * @v: argv array
+ * @s: input string
+ * Return: void
+ */
 static void fillv(char **v, char *s)
 {
 	int i;
@@ -32,6 +43,12 @@ static void fillv(char **v, char *s)
 	v[i] = NULL;
 }
 
+/**
+ * spl - split line into tokens
+ * @s: input string
+ * @ac: argc output
+ * Return: argv array
+ */
 char **spl(char *s, int *ac)
 {
 	char *c;
@@ -68,6 +85,11 @@ char **spl(char *s, int *ac)
 	return (v);
 }
 
+/**
+ * frev - free argv array
+ * @av: argv array
+ * Return: void
+ */
 void frev(char **av)
 {
 	if (av)

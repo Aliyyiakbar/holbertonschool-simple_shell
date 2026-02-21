@@ -2,11 +2,20 @@
 
 static int g_tty;
 
+/**
+ * is_tty - get tty flag
+ * Return: 1 if tty
+ */
 int is_tty(void)
 {
 	return (g_tty);
 }
 
+/**
+ * sig_h - handle SIGINT
+ * @s: signal number
+ * Return: void
+ */
 void sig_h(int s)
 {
 	(void)s;
@@ -18,6 +27,13 @@ void sig_h(int s)
 	}
 }
 
+/**
+ * gnl - get line with prompt
+ * @b: buffer
+ * @cap: buffer cap
+ * @tty: tty flag
+ * Return: bytes read or -1
+ */
 static ssize_t gnl(char **b, size_t *cap, int tty)
 {
 	ssize_t n;
@@ -36,6 +52,14 @@ static ssize_t gnl(char **b, size_t *cap, int tty)
 	return (n);
 }
 
+/**
+ * do_ln - handle one line
+ * @buf: input buffer
+ * @pr: program name
+ * @ln: line number
+ * @st: status pointer
+ * Return: 1 to break, 0 to continue
+ */
 static int do_ln(char *buf, char *pr, int ln, int *st)
 {
 	char **av;
@@ -70,6 +94,11 @@ static int do_ln(char *buf, char *pr, int ln, int *st)
 	return (0);
 }
 
+/**
+ * sh - main shell loop
+ * @av0: argv
+ * Return: status
+ */
 int sh(char **av0)
 {
 	char *buf;

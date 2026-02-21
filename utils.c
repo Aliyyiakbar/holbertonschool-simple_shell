@@ -1,5 +1,10 @@
 #include "bash.h"
 
+/**
+ * is_sp - check blank string
+ * @s: input string
+ * Return: 1 if blank, 0 else
+ */
 int is_sp(const char *s)
 {
 	int i;
@@ -21,6 +26,11 @@ int is_sp(const char *s)
 	return (1);
 }
 
+/**
+ * has_sl - check slash in string
+ * @s: input string
+ * Return: 1 if slash, 0 else
+ */
 int has_sl(const char *s)
 {
 	int i;
@@ -41,6 +51,11 @@ int has_sl(const char *s)
 	return (0);
 }
 
+/**
+ * sdup - duplicate string
+ * @s: input string
+ * Return: dup or NULL
+ */
 char *sdup(const char *s)
 {
 	size_t n;
@@ -62,6 +77,12 @@ char *sdup(const char *s)
 	return (d);
 }
 
+/**
+ * s2i - convert string to int
+ * @s: input string
+ * @o: output int
+ * Return: 1 on ok, 0 on fail
+ */
 int s2i(const char *s, int *o)
 {
 	long v;
@@ -96,6 +117,13 @@ int s2i(const char *s, int *o)
 	return (1);
 }
 
+/**
+ * p_err - print error
+ * @pr: program name
+ * @ln: line number
+ * @c: command
+ * Return: void
+ */
 void p_err(const char *pr, int ln, const char *c)
 {
 	fprintf(stderr, "%s: %d: %s: not found\n", pr, ln, c);

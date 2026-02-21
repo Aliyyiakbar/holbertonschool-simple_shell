@@ -1,5 +1,11 @@
 #include "bash.h"
 
+/**
+ * b_run - run builtin if match
+ * @av: argv array
+ * @st: status pointer
+ * Return: builtin code
+ */
 int b_run(char **av, int *st)
 {
 	if (av == NULL || av[0] == NULL)
@@ -20,6 +26,12 @@ int b_run(char **av, int *st)
 	return (BUILTIN_NONE);
 }
 
+/**
+ * b_exit - handle exit builtin
+ * @av: argv array
+ * @st: status pointer
+ * Return: builtin code
+ */
 int b_exit(char **av, int *st)
 {
 	int n;
@@ -44,6 +56,12 @@ int b_exit(char **av, int *st)
 	return (BUILTIN_EXIT);
 }
 
+/**
+ * b_env - print environment
+ * @av: argv array
+ * @st: status pointer
+ * Return: builtin code
+ */
 int b_env(char **av, int *st)
 {
 	int i;

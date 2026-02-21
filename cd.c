@@ -9,6 +9,9 @@
  */
 static int cd_dst(char **av, char **dst, int *st, char *pr, int ln)
 {
+	(void)pr;
+	(void)ln;
+
 	*dst = av[1];
 	if (*dst == NULL)
 	{
@@ -24,9 +27,13 @@ static int cd_dst(char **av, char **dst, int *st, char *pr, int ln)
 		*dst = env_get("OLDPWD");
 		if (*dst == NULL)
 		{
-			fprintf(stderr, "%s: %d: cd: OLDPWD not set\n", pr, ln);
-			*st = 1;
-			return (0);
+			*dst = env_get("PWD");
+			if (*dst == NULL || (*dst)[0] == '\0')
+			{
+				*dst = ".";
+			}
+			(void)pr;
+			(void)ln;
 		}
 	}
 	return (1);

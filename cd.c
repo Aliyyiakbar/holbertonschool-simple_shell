@@ -11,6 +11,11 @@ int b_cd(char **av, int *st)
 	char *dst, *old, *nw;
 
 	dst = av[1] ? av[1] : env_get("HOME");
+	if (dst == NULL)
+	{
+		*st = 0;
+		return (BUILTIN_HANDLED);
+	}
 	if (dst && s_cmp(dst, "-") == 0)
 	{
 		dst = env_get("OLDPWD");

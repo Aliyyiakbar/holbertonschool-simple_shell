@@ -23,7 +23,7 @@ void sig_h(int s)
 	if (g_tty)
 	{
 		write(STDOUT_FILENO, "\n", 1);
-		write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
+		write(STDOUT_FILENO, PROMPT, s_len(PROMPT));
 	}
 }
 
@@ -49,7 +49,7 @@ int sh(char **av0, int fd)
 	{
 		if (g_tty)
 		{
-			write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
+			write(STDOUT_FILENO, PROMPT, s_len(PROMPT));
 		}
 
 		buf = gl(fd);

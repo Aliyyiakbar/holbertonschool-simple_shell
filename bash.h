@@ -46,9 +46,15 @@ void h_save(void);
 char *rpath(char *c);
 int is_sp(const char *s);
 int has_sl(const char *s);
+size_t s_len(const char *s);
+char *s_cpy(char *d, const char *s);
+int s_cmp(const char *a, const char *b);
+int s_ncmp(const char *a, const char *b, size_t n);
+char *s_chr(const char *s, int c);
 char *sdup(const char *s);
 char *sdup_n(const char *s, size_t n);
 int s2i(const char *s, int *o);
 void p_err(const char *pr, int ln, const char *c);
+char *env_get(const char *n);
 
 #endif

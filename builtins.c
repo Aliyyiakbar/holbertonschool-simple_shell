@@ -12,35 +12,35 @@ int b_run(char **av, int *st)
 	{
 		return (BUILTIN_NONE);
 	}
-	if (strcmp(av[0], "exit") == 0)
+	if (s_cmp(av[0], "exit") == 0)
 	{
 		return (b_exit(av, st));
 	}
-	if (strcmp(av[0], "env") == 0)
+	if (s_cmp(av[0], "env") == 0)
 	{
 		return (b_env(av, st));
 	}
-	if (strcmp(av[0], "setenv") == 0)
+	if (s_cmp(av[0], "setenv") == 0)
 	{
 		return (b_set(av, st));
 	}
-	if (strcmp(av[0], "unsetenv") == 0)
+	if (s_cmp(av[0], "unsetenv") == 0)
 	{
 		return (b_unset(av, st));
 	}
-	if (strcmp(av[0], "cd") == 0)
+	if (s_cmp(av[0], "cd") == 0)
 	{
 		return (b_cd(av, st));
 	}
-	if (strcmp(av[0], "alias") == 0)
+	if (s_cmp(av[0], "alias") == 0)
 	{
 		return (b_alias(av, st));
 	}
-	if (strcmp(av[0], "help") == 0)
+	if (s_cmp(av[0], "help") == 0)
 	{
 		return (b_help(av, st));
 	}
-	if (strcmp(av[0], "history") == 0)
+	if (s_cmp(av[0], "history") == 0)
 	{
 		return (b_hist(av, st));
 	}

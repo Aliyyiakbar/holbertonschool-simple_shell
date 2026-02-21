@@ -16,7 +16,7 @@ static int a_find(char *n)
 
 	for (i = 0; i < a_sz; i++)
 	{
-		if (strcmp(a_n[i], n) == 0)
+		if (s_cmp(a_n[i], n) == 0)
 		{
 			return (i);
 		}
@@ -120,7 +120,7 @@ int b_alias(char **av, int *st)
 	}
 	for (i = 1; av[i] != NULL; i++)
 	{
-		eq = strchr(av[i], '=');
+		eq = s_chr(av[i], '=');
 		if (eq == NULL)
 		{
 			j = a_find(av[i]);
@@ -134,7 +134,7 @@ int b_alias(char **av, int *st)
 		v = eq + 1;
 		if (v[0] == '\'')
 		{
-			j = (int)strlen(v);
+			j = (int)s_len(v);
 			if (j > 1 && v[j - 1] == '\'')
 			{
 				v[j - 1] = '\0';

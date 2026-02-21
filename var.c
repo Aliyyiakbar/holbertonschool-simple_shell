@@ -35,7 +35,7 @@ static char *vget(char *s, int st)
 	{
 		return (i2s((int)getpid()));
 	}
-	e = getenv(s + 1);
+	e = env_get(s + 1);
 	if (e == NULL)
 	{
 		return (sdup(""));

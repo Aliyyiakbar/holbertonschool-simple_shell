@@ -9,7 +9,7 @@ static char *env_path(void)
 	int i;
 	size_t ln;
 
-	ln = strlen("PATH=");
+	ln = s_len("PATH=");
 	if (environ == NULL)
 	{
 		return (NULL);
@@ -17,7 +17,7 @@ static char *env_path(void)
 
 	for (i = 0; environ[i] != NULL; i++)
 	{
-		if (strncmp(environ[i], "PATH=", ln) == 0)
+		if (s_ncmp(environ[i], "PATH=", ln) == 0)
 		{
 			return (environ[i] + ln);
 		}
@@ -37,7 +37,7 @@ static char *mk_path(const char *d, const char *c)
 	size_t n;
 	char *p;
 
-	n = strlen(d) + strlen(c) + 2;
+	n = s_len(d) + s_len(c) + 2;
 	p = malloc(n);
 	if (p == NULL)
 	{

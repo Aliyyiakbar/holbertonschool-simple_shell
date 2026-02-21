@@ -10,10 +10,10 @@ int b_cd(char **av, int *st)
 {
 	char *dst, *old, *nw;
 
-	dst = av[1] ? av[1] : getenv("HOME");
-	if (dst && strcmp(dst, "-") == 0)
+	dst = av[1] ? av[1] : env_get("HOME");
+	if (dst && s_cmp(dst, "-") == 0)
 	{
-		dst = getenv("OLDPWD");
+		dst = env_get("OLDPWD");
 		if (dst == NULL)
 		{
 			fprintf(stderr, "cd: OLDPWD not set\n");
@@ -38,7 +38,7 @@ int b_cd(char **av, int *st)
 	if (nw)
 	{
 		env_set("PWD", nw);
-		if (av[1] && strcmp(av[1], "-") == 0)
+		if (av[1] && s_cmp(av[1], "-") == 0)
 		{
 			printf("%s\n", nw);
 		}

@@ -20,7 +20,7 @@ int b_env(char **av, int *st)
 
 	for (i = 0; environ[i] != NULL; i++)
 	{
-		write(STDOUT_FILENO, environ[i], strlen(environ[i]));
+		write(STDOUT_FILENO, environ[i], s_len(environ[i]));
 		write(STDOUT_FILENO, "\n", 1);
 	}
 

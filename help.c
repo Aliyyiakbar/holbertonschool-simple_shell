@@ -24,7 +24,7 @@ int b_help(char **av, int *st)
 	}
 	for (i = 0; n[i] != NULL; i++)
 	{
-		if (strcmp(av[1], n[i]) == 0)
+		if (s_cmp(av[1], n[i]) == 0)
 		{
 			printf("%s", u[i]);
 			*st = 0;

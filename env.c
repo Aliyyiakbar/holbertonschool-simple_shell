@@ -16,15 +16,40 @@ static int env_idx(char *n)
 	{
 		return (-1);
 	}
-	ln = strlen(n);
+	ln = s_len(n);
 	for (i = 0; environ[i] != NULL; i++)
 	{
-		if (strncmp(environ[i], n, ln) == 0 && environ[i][ln] == '=')
+		if (s_ncmp(environ[i], n, ln) == 0 && environ[i][ln] == '=')
 		{
 			return (i);
 		}
 	}
 	return (-1);
+}
+
+/**
+ * env_get - get env value
+ * @n: name
+ * Return: value or NULL
+ */
+char *env_get(const char *n)
+{
+	size_t ln;
+	int i;
+
+	if (n == NULL || n[0] == '\0' || environ == NULL)
+	{
+		return (NULL);
+	}
+	ln = s_len(n);
+	for (i = 0; environ[i] != NULL; i++)
+	{
+		if (s_ncmp(environ[i], n, ln) == 0 && environ[i][ln] == '=')
+		{
+			return (environ[i] + ln + 1);
+		}
+	}
+	return (NULL);
 }
 
 /**
@@ -52,11 +77,11 @@ int env_set(char *n, char *v)
 	char *s;
 	char **nv;
 	int i, cnt;
-	if (n == NULL || v == NULL || n[0] == '\0' || strchr(n, '='))
+	if (n == NULL || v == NULL || n[0] == '\0' || s_chr(n, '='))
 	{
 		return (0);
 	}
-	s = malloc(strlen(n) + strlen(v) + 2);
+	s = malloc(s_len(n) + s_len(v) + 2);
 	if (s == NULL)
 	{
 		return (0);
@@ -103,7 +128,7 @@ int env_unset(char *n)
 	int cnt;
 	int idx;
 
-	if (n == NULL || n[0] == '\0' || strchr(n, '='))
+	if (n == NULL || n[0] == '\0' || s_chr(n, '='))
 	{
 		return (0);
 	}

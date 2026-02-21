@@ -11,15 +11,15 @@ static int opv(char *s)
 	{
 		return (0);
 	}
-	if (strcmp(s, ";") == 0)
+	if (s_cmp(s, ";") == 0)
 	{
 		return (1);
 	}
-	if (strcmp(s, "&&") == 0)
+	if (s_cmp(s, "&&") == 0)
 	{
 		return (2);
 	}
-	if (strcmp(s, "||") == 0)
+	if (s_cmp(s, "||") == 0)
 	{
 		return (3);
 	}

@@ -50,7 +50,7 @@ void h_add(char *s)
 	{
 		return;
 	}
-	n = strlen(s);
+	n = s_len(s);
 	if (n && s[n - 1] == '\n')
 	{
 		n--;
@@ -94,12 +94,12 @@ void h_load(void)
 	size_t n;
 	char *ln;
 
-	home = getenv("HOME");
+	home = env_get("HOME");
 	if (home == NULL)
 	{
 		return;
 	}
-	n = strlen(home) + strlen("/.simple_shell_history") + 1;
+	n = s_len(home) + s_len("/.simple_shell_history") + 1;
 	p = malloc(n);
 	if (p == NULL)
 	{
@@ -134,12 +134,12 @@ void h_save(void)
 	int i;
 	size_t n;
 
-	home = getenv("HOME");
+	home = env_get("HOME");
 	if (home == NULL)
 	{
 		return;
 	}
-	n = strlen(home) + strlen("/.simple_shell_history") + 1;
+	n = s_len(home) + s_len("/.simple_shell_history") + 1;
 	p = malloc(n);
 	if (p == NULL)
 	{
@@ -154,7 +154,7 @@ void h_save(void)
 	}
 	for (i = 0; i < h_n; i++)
 	{
-		write(fd, h_v[i], strlen(h_v[i]));
+		write(fd, h_v[i], s_len(h_v[i]));
 		write(fd, "\n", 1);
 	}
 	close(fd);

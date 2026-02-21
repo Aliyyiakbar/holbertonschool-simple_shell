@@ -1,6 +1,6 @@
 #include "bash.h"
 
-int is_blank(const char *s)
+int is_sp(const char *s)
 {
 	int i;
 
@@ -21,7 +21,7 @@ int is_blank(const char *s)
 	return (1);
 }
 
-int contains_slash(const char *s)
+int has_sl(const char *s)
 {
 	int i;
 
@@ -41,28 +41,28 @@ int contains_slash(const char *s)
 	return (0);
 }
 
-char *str_duplicate(const char *s)
+char *sdup(const char *s)
 {
-	size_t len;
-	char *dup;
+	size_t n;
+	char *d;
 
 	if (s == NULL)
 	{
 		return (NULL);
 	}
 
-	len = strlen(s);
-	dup = malloc(len + 1);
-	if (dup == NULL)
+	n = strlen(s);
+	d = malloc(n + 1);
+	if (d == NULL)
 	{
 		return (NULL);
 	}
 
-	strcpy(dup, s);
-	return (dup);
+	strcpy(d, s);
+	return (d);
 }
 
-int str_to_int(const char *s, int *out)
+int s2i(const char *s, int *o)
 {
 	long v;
 	int i;
@@ -92,11 +92,11 @@ int str_to_int(const char *s, int *out)
 		}
 	}
 
-	*out = (int)v;
+	*o = (int)v;
 	return (1);
 }
 
-void print_error(const char *prog, int line, const char *cmd)
+void p_err(const char *pr, int ln, const char *c)
 {
-	fprintf(stderr, "%s: %d: %s: not found\n", prog, line, cmd);
+	fprintf(stderr, "%s: %d: %s: not found\n", pr, ln, c);
 }

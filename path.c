@@ -1,11 +1,11 @@
 #include "bash.h"
 
-static char *get_env_path(void)
+static char *env_path(void)
 {
 	int i;
-	size_t len;
+	size_t ln;
 
-	len = strlen("PATH=");
+	ln = strlen("PATH=");
 	if (environ == NULL)
 	{
 		return (NULL);
@@ -13,90 +13,86 @@ static char *get_env_path(void)
 
 	for (i = 0; environ[i] != NULL; i++)
 	{
-		if (strncmp(environ[i], "PATH=", len) == 0)
+		if (strncmp(environ[i], "PATH=", ln) == 0)
 		{
-			return (environ[i] + len);
+			return (environ[i] + ln);
 		}
 	}
 
 	return (NULL);
 }
 
-static char *build_path(const char *dir, const char *cmd)
+static char *mk_path(const char *d, const char *c)
 {
-	size_t len;
-	char *full;
+	size_t n;
+	char *p;
 
-	len = strlen(dir) + strlen(cmd) + 2;
-	full = malloc(len);
-	if (full == NULL)
+	n = strlen(d) + strlen(c) + 2;
+	p = malloc(n);
+	if (p == NULL)
 	{
 		return (NULL);
 	}
 
-	sprintf(full, "%s/%s", dir, cmd);
-	return (full);
+	sprintf(p, "%s/%s", d, c);
+	return (p);
 }
 
-char *resolve_path(char *cmd)
+char *rpath(char *c)
 {
-	char *pe;
-	char *pc;
-	char *tok;
-	char *full;
-	char *found;
+	char *pe, *pc, *t, *p, *fd;
 
-	if (cmd == NULL || cmd[0] == '\0')
+	if (c == NULL || c[0] == '\0')
 	{
 		return (NULL);
 	}
 
-	if (contains_slash(cmd))
+	if (has_sl(c))
 	{
-		if (access(cmd, X_OK) == 0 || access(cmd, F_OK) == 0)
+		if (access(c, X_OK) == 0 || access(c, F_OK) == 0)
 		{
-			return (str_duplicate(cmd));
+			return (sdup(c));
 		}
 		return (NULL);
 	}
 
-	pe = get_env_path();
+	pe = env_path();
 	if (pe == NULL)
 	{
 		return (NULL);
 	}
 
-	pc = str_duplicate(pe);
+	pc = sdup(pe);
 	if (pc == NULL)
 	{
 		return (NULL);
 	}
 
-	found = NULL;
-	tok = strtok(pc, ":");
-	while (tok)
+	fd = NULL;
+	t = strtok(pc, ":");
+	while (t)
 	{
-		full = build_path(tok, cmd);
-		if (full && access(full, X_OK) == 0)
+		p = mk_path(t, c);
+		if (p && access(p, X_OK) == 0)
 		{
-			if (found)
+			if (fd)
 			{
-				free(found);
+				free(fd);
 			}
 			free(pc);
-			return (full);
+			return (p);
 		}
-		if (full && access(full, F_OK) == 0 && found == NULL)
+		if (p && access(p, F_OK) == 0 && fd == NULL)
 		{
-			found = full;
+			fd = p;
 		}
 		else
 		{
-			free(full);
+			free(p);
 		}
-		tok = strtok(NULL, ":");
+		t = strtok(NULL, ":");
 	}
 
 	free(pc);
-	return (found);
+	return (fd);
 }

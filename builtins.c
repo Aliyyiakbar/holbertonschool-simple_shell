@@ -1,6 +1,6 @@
 #include "bash.h"
 
-int handle_builtin(char **av, int *st)
+int b_run(char **av, int *st)
 {
 	if (av == NULL || av[0] == NULL)
 	{
@@ -9,18 +9,18 @@ int handle_builtin(char **av, int *st)
 
 	if (strcmp(av[0], "exit") == 0)
 	{
-		return (builtin_exit(av, st));
+		return (b_exit(av, st));
 	}
 
 	if (strcmp(av[0], "env") == 0)
 	{
-		return (builtin_env(av, st));
+		return (b_env(av, st));
 	}
 
 	return (BUILTIN_NONE);
 }
 
-int builtin_exit(char **av, int *st)
+int b_exit(char **av, int *st)
 {
 	int n;
 
@@ -32,7 +32,7 @@ int builtin_exit(char **av, int *st)
 			*st = 2;
 			return (BUILTIN_HANDLED);
 		}
-		if (str_to_int(av[1], &n) == 0)
+		if (s2i(av[1], &n) == 0)
 		{
 			fprintf(stderr, "exit: Illegal number: %s\n", av[1]);
 			*st = 2;
@@ -44,7 +44,7 @@ int builtin_exit(char **av, int *st)
 	return (BUILTIN_EXIT);
 }
 
-int builtin_env(char **av, int *st)
+int b_env(char **av, int *st)
 {
 	int i;
 

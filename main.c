@@ -1,8 +1,8 @@
 #include "bash.h"
 
-int main(int argc, char **argv)
+int main(int ac, char **av)
 {
-	(void)argc;
+	(void)ac;
 
-	return (shell_loop(argv));
+	return (sh(av));
 }

@@ -1,33 +1,33 @@
 #include "bash.h"
 
-static int g_int;
+static int g_tty;
 
-int is_interactive(void)
+int is_tty(void)
 {
-	return (g_int);
+	return (g_tty);
 }
 
-void sigint_handler(int sig)
+void sig_h(int s)
 {
-	(void)sig;
+	(void)s;
 
-	if (g_int)
+	if (g_tty)
 	{
 		write(STDOUT_FILENO, "\n", 1);
 		write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
 	}
 }
 
-static int run_cmd(char **av, char *pr, int ln, int *st)
+static int run(char **av, char *pr, int ln, int *st)
 {
 	pid_t pid;
 	int ws;
-	char *path;
+	char *p;
 
-	path = resolve_path(av[0]);
-	if (path == NULL)
+	p = rpath(av[0]);
+	if (p == NULL)
 	{
-		print_error(pr, ln, av[0]);
+		p_err(pr, ln, av[0]);
 		*st = 127;
 		return (0);
 	}
@@ -35,7 +35,7 @@ static int run_cmd(char **av, char *pr, int ln, int *st)
 	pid = fork();
 	if (pid == 0)
 	{
-		execve(path, av, environ);
+		execve(p, av, environ);
 		if (errno == EACCES)
 		{
 			fprintf(stderr, "%s: %d: %s: Permission denied\n",
@@ -46,7 +46,7 @@ static int run_cmd(char **av, char *pr, int ln, int *st)
 			fprintf(stderr, "%s: %d: %s: not found\n",
 				pr, ln, av[0]);
 		}
-		free(path);
+		free(p);
 		exit(126);
 	}
 	else if (pid < 0)
@@ -71,31 +71,28 @@ static int run_cmd(char **av, char *pr, int ln, int *st)
 		}
 	}
 
-	free(path);
+	free(p);
 	return (0);
 }
 
-int shell_loop(char **argv)
+int sh(char **av0)
 {
-	char *buf;
+	char *buf, **av;
 	size_t cap;
 	ssize_t n;
-	char **av;
-	int st;
-	int ln;
-	int br;
+	int st, ln, br;
 
 	buf = NULL;
 	cap = 0;
 	st = 0;
 	ln = 0;
 
-	g_int = isatty(STDIN_FILENO);
-	signal(SIGINT, sigint_handler);
+	g_tty = isatty(STDIN_FILENO);
+	signal(SIGINT, sig_h);
 
 	while (1)
 	{
-		if (g_int)
+		if (g_tty)
 		{
 			write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
 		}
@@ -103,7 +100,7 @@ int shell_loop(char **argv)
 		n = getline(&buf, &cap, stdin);
 		if (n == -1)
 		{
-			if (g_int)
+			if (g_tty)
 			{
 				write(STDOUT_FILENO, "\n", 1);
 			}
@@ -111,32 +108,32 @@ int shell_loop(char **argv)
 		}
 
 		ln++;
-		if (is_blank(buf))
+		if (is_sp(buf))
 		{
 			continue;
 		}
 
-		av = split_line(buf, NULL);
+		av = spl(buf, NULL);
 		if (av == NULL || av[0] == NULL)
 		{
-			free_args(av);
+			frev(av);
 			continue;
 		}
 
-		br = handle_builtin(av, &st);
+		br = b_run(av, &st);
 		if (br == BUILTIN_EXIT)
 		{
-			free_args(av);
+			frev(av);
 			break;
 		}
 		if (br == BUILTIN_HANDLED)
 		{
-			free_args(av);
+			frev(av);
 			continue;
 		}
 
-		run_cmd(av, argv[0], ln, &st);
-		free_args(av);
+		run(av, av0[0], ln, &st);
+		frev(av);
 	}
 
 	free(buf);

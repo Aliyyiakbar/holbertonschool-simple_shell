@@ -1,68 +1,68 @@
 #include "bash.h"
 
-static int count_tokens(char *s)
+static int ctok(char *s)
 {
 	int n;
-	char *tok;
+	char *t;
 
 	n = 0;
-	tok = strtok(s, " \t\r\n");
-	while (tok)
+	t = strtok(s, " \t\r\n");
+	while (t)
 	{
 		n++;
-		tok = strtok(NULL, " \t\r\n");
+		t = strtok(NULL, " \t\r\n");
 	}
 
 	return (n);
 }
 
-char **split_line(char *line, int *argc)
+char **spl(char *s, int *ac)
 {
-	char *copy;
-	char *tok;
-	char **av;
+	char *c;
+	char *t;
+	char **v;
 	int n;
 	int i;
 
-	if (line == NULL)
+	if (s == NULL)
 	{
 		return (NULL);
 	}
 
-	copy = str_duplicate(line);
-	if (copy == NULL)
+	c = sdup(s);
+	if (c == NULL)
 	{
 		return (NULL);
 	}
 
-	n = count_tokens(copy);
-	free(copy);
+	n = ctok(c);
+	free(c);
 
-	av = malloc(sizeof(char *) * (n + 1));
-	if (av == NULL)
+	v = malloc(sizeof(char *) * (n + 1));
+	if (v == NULL)
 	{
 		return (NULL);
 	}
 
 	i = 0;
-	tok = strtok(line, " \t\r\n");
-	while (tok)
+	t = strtok(s, " \t\r\n");
+	while (t)
 	{
-		av[i] = tok;
+		v[i] = t;
 		i++;
-		tok = strtok(NULL, " \t\r\n");
+		t = strtok(NULL, " \t\r\n");
 	}
-	av[i] = NULL;
+	v[i] = NULL;
 
-	if (argc)
+	if (ac)
 	{
-		*argc = n;
+		*ac = n;
 	}
 
-	return (av);
+	return (v);
 }
 
-void free_args(char **av)
+void frev(char **av)
 {
 	if (av)
 	{

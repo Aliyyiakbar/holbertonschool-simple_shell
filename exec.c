@@ -136,7 +136,6 @@ static int run_seg(char **t, int i, int j, char *pr, int ln, int *st, int op)
 int exec_ln(char *buf, char *pr, int *st, int ln)
 {
 	char **t;
-	char **av;
 	int i;
 	int j;
 	int op;

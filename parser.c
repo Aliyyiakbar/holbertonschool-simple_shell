@@ -1,46 +1,74 @@
 #include "bash.h"
 
 /**
- * ctok - count tokens in string
- * @s: input string
- * Return: token count
+ * ws - check whitespace
+ * @c: char
+ * Return: 1 if whitespace
  */
-static int ctok(char *s)
+static int ws(char c)
 {
-	int n;
-	char *t;
-
-	n = 0;
-	t = strtok(s, " \t\r\n");
-	while (t)
-	{
-		n++;
-		t = strtok(NULL, " \t\r\n");
-	}
-
-	return (n);
+	return (c == ' ' || c == '\t' || c == '\n' || c == '\r');
 }
 
 /**
- * fillv - fill argv array
- * @v: argv array
+ * op_len - operator length
  * @s: input string
- * Return: void
+ * @i: index
+ * Return: op length or 0
  */
-static void fillv(char **v, char *s)
+static int op_len(char *s, int i)
 {
-	int i;
-	char *t;
-
-	i = 0;
-	t = strtok(s, " \t\r\n");
-	while (t)
+	if (s[i] == ';')
 	{
-		v[i] = t;
-		i++;
-		t = strtok(NULL, " \t\r\n");
+		return (1);
 	}
-	v[i] = NULL;
+	if (s[i] == '&' && s[i + 1] == '&')
+	{
+		return (2);
+	}
+	if (s[i] == '|' && s[i + 1] == '|')
+	{
+		return (2);
+	}
+	return (0);
+}
+
+/**
+ * push - push token
+ * @v: vector
+ * @n: count
+ * @cap: cap
+ * @s: token
+ * Return: 1 on ok
+ */
+static int push(char ***v, int *n, int *cap, char *s)
+{
+	char **nv;
+	int i;
+	int nc;
+
+	if (*n + 2 > *cap)
+	{
+		nc = (*cap == 0) ? 8 : (*cap * 2);
+		nv = malloc(sizeof(char *) * nc);
+		if (nv == NULL)
+		{
+			free(s);
+			return (0);
+		}
+		for (i = 0; i < *n; i++)
+		{
+			nv[i] = (*v)[i];
+		}
+		free(*v);
+		*v = nv;
+		*cap = nc;
+	}
+
+	(*v)[*n] = s;
+	(*n)++;
+	(*v)[*n] = NULL;
+	return (1);
 }
 
 /**
@@ -51,37 +79,76 @@ static void fillv(char **v, char *s)
  */
 char **spl(char *s, int *ac)
 {
-	char *c;
 	char **v;
 	int n;
+	int cap;
+	int i;
+	int st;
+	int ln;
+	char *t;
 
 	if (s == NULL)
 	{
 		return (NULL);
 	}
 
-	c = sdup(s);
-	if (c == NULL)
+	v = NULL;
+	n = 0;
+	cap = 0;
+	i = 0;
+	while (s[i])
 	{
-		return (NULL);
+		while (ws(s[i]))
+		{
+			i++;
+		}
+		if (s[i] == '\0')
+		{
+			break;
+		}
+		if (s[i] == '#' && (i == 0 || ws(s[i - 1])))
+		{
+			break;
+		}
+		ln = op_len(s, i);
+		if (ln)
+		{
+			t = sdup_n(s + i, ln);
+			if (t == NULL || !push(&v, &n, &cap, t))
+			{
+				frev(v);
+				return (NULL);
+			}
+			i += ln;
+			continue;
+		}
+		st = i;
+		while (s[i] && !ws(s[i]) && !op_len(s, i))
+		{
+			i++;
+		}
+		t = sdup_n(s + st, i - st);
+		if (t == NULL || !push(&v, &n, &cap, t))
+		{
+			frev(v);
+			return (NULL);
+		}
 	}
 
-	n = ctok(c);
-	free(c);
-
-	v = malloc(sizeof(char *) * (n + 1));
 	if (v == NULL)
 	{
-		return (NULL);
+		v = malloc(sizeof(char *));
+		if (v == NULL)
+		{
+			return (NULL);
+		}
+		v[0] = NULL;
 	}
-
-	fillv(v, s);
 
 	if (ac)
 	{
 		*ac = n;
 	}
-
 	return (v);
 }
 
@@ -92,8 +159,15 @@ char **spl(char *s, int *ac)
  */
 void frev(char **av)
 {
-	if (av)
+	int i;
+
+	if (av == NULL)
 	{
-		free(av);
+		return;
 	}
+	for (i = 0; av[i] != NULL; i++)
+	{
+		free(av[i]);
+	}
+	free(av);
 }

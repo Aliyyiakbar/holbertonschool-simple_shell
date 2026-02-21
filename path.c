@@ -71,33 +71,61 @@ static char *sl_ok(char *c)
  */
 static char *scan(char *pc, char *c)
 {
-	char *t;
+	char *d;
 	char *p;
 	char *fd;
+	size_t i;
+	size_t st;
+	size_t ln;
 
 	fd = NULL;
-	t = strtok(pc, ":");
-	while (t)
+	i = 0;
+	st = 0;
+	while (1)
 	{
-		p = mk_path(t, c);
-		if (p && access(p, X_OK) == 0)
+		if (pc[i] == ':' || pc[i] == '\0')
 		{
-			if (fd)
+			ln = i - st;
+			if (ln == 0)
+			{
+				d = sdup(".");
+			}
+			else
+			{
+				d = sdup_n(pc + st, ln);
+			}
+			if (d == NULL)
 			{
 				free(fd);
+				free(pc);
+				return (NULL);
 			}
-			free(pc);
-			return (p);
+			p = mk_path(d, c);
+			free(d);
+			if (p && access(p, X_OK) == 0)
+			{
+				if (fd)
+				{
+					free(fd);
+				}
+				free(pc);
+				return (p);
+			}
+			if (p && access(p, F_OK) == 0 && fd == NULL)
+			{
+				fd = p;
+			}
+			else
+			{
+				free(p);
+			}
+			if (pc[i] == '\0')
+			{
+				break;
+			}
+			st = i + 1;
 		}
-		if (p && access(p, F_OK) == 0 && fd == NULL)
-		{
-			fd = p;
-		}
-		else
-		{
-			free(p);
-		}
-		t = strtok(NULL, ":");
+		i++;
 	}
 
 	free(pc);

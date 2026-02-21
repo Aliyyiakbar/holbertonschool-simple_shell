@@ -28,31 +28,6 @@ void sig_h(int s)
 }
 
 /**
- * gnl - get line with prompt
- * @b: buffer
- * @cap: buffer cap
- * @tty: tty flag
- * Return: bytes read or -1
- */
-static ssize_t gnl(char **b, size_t *cap, int tty)
-{
-	ssize_t n;
-
-	if (tty)
-	{
-		write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
-	}
-
-	n = getline(b, cap, stdin);
-	if (n == -1 && tty)
-	{
-		write(STDOUT_FILENO, "\n", 1);
-	}
-
-	return (n);
-}
-
-/**
  * do_ln - handle one line
  * @buf: input buffer
  * @pr: program name
@@ -99,37 +74,43 @@ static int do_ln(char *buf, char *pr, int ln, int *st)
  * @av0: argv
  * Return: status
  */
-int sh(char **av0)
+int sh(char **av0, int fd)
 {
 	char *buf;
-	size_t cap;
-	ssize_t n;
 	int st;
 	int ln;
 
-	buf = NULL;
-	cap = 0;
 	st = 0;
 	ln = 0;
 
-	g_tty = isatty(STDIN_FILENO);
+	g_tty = isatty(fd);
 	signal(SIGINT, sig_h);
 
 	while (1)
 	{
-		n = gnl(&buf, &cap, g_tty);
-		if (n == -1)
+		if (g_tty)
 		{
+			write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
+		}
+
+		buf = gl(fd);
+		if (buf == NULL)
+		{
+			if (g_tty)
+			{
+				write(STDOUT_FILENO, "\n", 1);
+			}
 			break;
 		}
 
 		ln++;
 		if (do_ln(buf, av0[0], ln, &st))
 		{
+			free(buf);
 			break;
 		}
+		free(buf);
 	}
 
-	free(buf);
 	return (st);
 }

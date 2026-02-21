@@ -22,6 +22,30 @@ int b_run(char **av, int *st)
 	{
 		return (b_env(av, st));
 	}
+	if (strcmp(av[0], "setenv") == 0)
+	{
+		return (b_set(av, st));
+	}
+	if (strcmp(av[0], "unsetenv") == 0)
+	{
+		return (b_unset(av, st));
+	}
+	if (strcmp(av[0], "cd") == 0)
+	{
+		return (b_cd(av, st));
+	}
+	if (strcmp(av[0], "alias") == 0)
+	{
+		return (b_alias(av, st));
+	}
+	if (strcmp(av[0], "help") == 0)
+	{
+		return (b_help(av, st));
+	}
+	if (strcmp(av[0], "history") == 0)
+	{
+		return (b_hist(av, st));
+	}
 
 	return (BUILTIN_NONE);
 }
@@ -54,32 +78,4 @@ int b_exit(char **av, int *st)
 	}
 
 	return (BUILTIN_EXIT);
-}
-
-/**
- * b_env - print environment
- * @av: argv array
- * @st: status pointer
- * Return: builtin code
- */
-int b_env(char **av, int *st)
-{
-	int i;
-
-	(void)av;
-
-	if (environ == NULL)
-	{
-		*st = 0;
-		return (BUILTIN_HANDLED);
-	}
-
-	for (i = 0; environ[i] != NULL; i++)
-	{
-		write(STDOUT_FILENO, environ[i], strlen(environ[i]));
-		write(STDOUT_FILENO, "\n", 1);
-	}
-
-	*st = 0;
-	return (BUILTIN_HANDLED);
 }

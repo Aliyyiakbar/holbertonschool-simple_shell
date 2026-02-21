@@ -52,32 +52,6 @@ int has_sl(const char *s)
 }
 
 /**
- * sdup - duplicate string
- * @s: input string
- * Return: dup or NULL
- */
-char *sdup(const char *s)
-{
-	size_t n;
-	char *d;
-
-	if (s == NULL)
-	{
-		return (NULL);
-	}
-
-	n = strlen(s);
-	d = malloc(n + 1);
-	if (d == NULL)
-	{
-		return (NULL);
-	}
-
-	strcpy(d, s);
-	return (d);
-}
-
-/**
  * s2i - convert string to int
  * @s: input string
  * @o: output int

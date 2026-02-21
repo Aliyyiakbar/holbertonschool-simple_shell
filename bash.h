@@ -18,10 +18,11 @@ extern char **environ;
 #define BUILTIN_HANDLED 1
 #define BUILTIN_EXIT 2
 
-int sh(char **av);
+int sh(char **av, int fd);
 void sig_h(int s);
 int is_tty(void);
 int run(char **av, char *pr, int ln, int *st);
+char *gl(int fd);
 char **spl(char *s, int *ac);
 void frev(char **av);
 int b_run(char **av, int *st);
@@ -31,6 +32,7 @@ char *rpath(char *c);
 int is_sp(const char *s);
 int has_sl(const char *s);
 char *sdup(const char *s);
+char *sdup_n(const char *s, size_t n);
 int s2i(const char *s, int *o);
 void p_err(const char *pr, int ln, const char *c);
 

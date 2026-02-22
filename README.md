@@ -1,44 +1,43 @@
-# Holberton School – Simple Shell
+# Holberton School - Simple Shell
 
-This repository contains our C implementation of a custom UNIX command line interpreter for the Holberton School *Simple Shell* project. The goal is to understand how a shell works under the hood by handling the command line, parsing arguments, creating processes, and executing programs using system calls.
+This repository contains our C implementation of a custom UNIX command line
+interpreter for the Holberton School *Simple Shell* project. It focuses on
+parsing input, built-ins, PATH resolution, and process execution.
 
 ## Requirements
 
 - OS: Ubuntu 20.04 LTS
-- Compiler: gcc
+- Compiler: `gcc`
 - Flags: `-Wall -Werror -Wextra -pedantic -std=gnu89`
 - Style: Betty
 - No memory leaks
 - Max 5 functions per file
 - All header files should be include guarded
+- Manual page: `man_1_simple_shell`
 
-## Authorized Functions / System Calls
+## Builtins
 
-- `access`, `chdir`, `close`, `closedir`, `execve`, `exit`, `_exit`, `fflush`, `fork`, `free`, `getcwd`, `getline`, `getpid`, `isatty`, `kill`, `malloc`, `open`, `opendir`, `perror`, `printf`, `fprintf`, `vfprintf`, `sprintf`, `putchar`, `read`, `readdir`, `signal`, `stat`, `lstat`, `fstat`, `strtok`, `wait`, `waitpid`, `wait3`, `wait4`, `write`
-
-## Files
-
-- `AUTHORS` — List of contributors
-- `man_1_simple_shell` — Manual page for the shell
-- `main.h` — Prototypes, structs, and macros
-- `shell.c` — Main entry point (loop, prompt, and execution)
-- `parser.c` — Command tokenization and string parsing helpers
-- `builtins.c` — Implementation of built-in commands (env, exit)
-- `path.c` — Handling the PATH environment variable
-- `utils.c` — Shared helpers (string manipulation, memory management)
+- `exit` - exit the shell (optional status)
+- `env` - print the environment
+- `setenv` - set an environment variable
+- `unsetenv` - unset an environment variable
+- `cd` - change directory
+- `alias` - define or print aliases
+- `help` - show builtin help
+- `history` - show command history
 
 ## Features
 
-- Displays a prompt and waits for the user to type a command.
-- Creates a child process in which the command is checked.
-- Checks for built-ins first, then searches the `PATH`.
-- Handles the end of file condition (`Ctrl+D`).
-- Handles `Ctrl+C` signal (does not quit the shell).
-- Supports both interactive and non-interactive modes.
-
-### Built-in Commands
-- `exit` — Exits the shell
-- `env` — Prints the current environment variables
+- Interactive prompt `($)` and non-interactive mode
+- Execute external commands with `fork`/`execve`
+- Search commands in `PATH`
+- Operators: `;`, `&&`, `||`
+- Comments with `#` at the start of a token or after whitespace
+- Variable expansion: `$?`, `$$`, and `$NAME`
+- Alias expansion with a recursion guard
+- History stored in `~/.simple_shell_history`
+- Script/file mode: `./hsh filename`
+- `Ctrl+C` prints a new prompt without exiting
 
 ## Compilation
 
@@ -48,45 +47,29 @@ gcc -Wall -Werror -Wextra -pedantic -std=gnu89 *.c -o hsh
 
 ## Usage
 
-The shell works in both interactive and non-interactive mode.
-
-### Interactive Mode
-Run the executable and type commands at the prompt:
+Interactive:
 
 ```bash
 $ ./hsh
 ($) /bin/ls
 file1 file2 file3
-($)
 ($) exit
 ```
 
-### Non-Interactive Mode
-Pipe commands into the executable:
+Non-interactive:
 
 ```bash
 $ echo "/bin/ls" | ./hsh
 file1 file2 file3
 ```
 
-## Example
+File mode:
 
-Output mimics the standard `/bin/sh`.
-
-**Standard sh:**
 ```bash
-$ echo "qwerty" | /bin/sh
-/bin/sh: 1: qwerty: not found
+$ ./hsh script.sh
 ```
 
-**Our hsh:**
-```bash
-$ echo "qwerty" | ./hsh
-./hsh: 1: qwerty: not found
-```
+## Author
 
-## Authors
-
+Aliyyiakbar Shirinli  
 Nahid Agazadeh
-
-Aliyyiakbar Shirinli
